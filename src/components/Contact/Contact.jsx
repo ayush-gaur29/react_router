@@ -1,5 +1,6 @@
 import React from 'react';
 import emailjs from "emailjs-com";
+import { motion } from "framer-motion";
 
 export default function Contact() {
 
@@ -26,6 +27,12 @@ export default function Contact() {
   };
 
   return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 1 }}
+    >
     <div className="relative flex items-top justify-center min-h-[700px] bg-white sm:items-center sm:pt-0">
       <div className="max-w-6xl mx-auto sm:px-6 lg:px-8">
         <div className="mt-8 overflow-hidden">
@@ -100,5 +107,6 @@ export default function Contact() {
         </div>
       </div>
     </div>
+    </motion.div>
   );
 }

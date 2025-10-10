@@ -1,14 +1,8 @@
-import react from 'react'
-import Header from './components/Header/Header'
+import React, { useState } from "react";
 
-function App() {
-  
 
-  return (
-    <>
-      
-    </>
-  )
+
+
+export default function App() {
+  <></>
 }
-
-export default App

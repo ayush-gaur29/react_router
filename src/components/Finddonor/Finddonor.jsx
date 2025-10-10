@@ -1,5 +1,6 @@
 // Donors.jsx
 import React, { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 function Finddonor() {
   const [donors, setDonors] = useState([]);
@@ -16,6 +17,12 @@ function Finddonor() {
   );
 
   return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -10 }}
+      transition={{ duration: 1 }}
+    >
     <div className="max-w-3xl mx-auto p-6 bg-white rounded shadow">
       <h2 className="text-2xl font-bold text-red-700 mb-4">Donor List</h2>
       <input
@@ -47,6 +54,7 @@ function Finddonor() {
         )}
       </ul>
     </div>
+    </motion.div>
   );
 }
 

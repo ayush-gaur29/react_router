@@ -10,6 +10,8 @@ import Contact from './components/Contact/Contact.jsx'
 
 import Donors from './components/Donors/Donors.jsx'
 import Finddonor from './components/Finddonor/Finddonor.jsx'
+import DonatedBlood from './components/Donatedblood/Donatedblood.jsx'
+
 
 // const router = createBrowserRouter([
 //   {
@@ -32,6 +34,7 @@ import Finddonor from './components/Finddonor/Finddonor.jsx'
 //   }
 // ])
 
+
 const router = createBrowserRouter(
   createRoutesFromElements(
     <Route path='/' element={<Layout />}> 
@@ -39,6 +42,7 @@ const router = createBrowserRouter(
     <Route path='about' element={<About />} />
     <Route path='contact' element={<Contact />}/>
     <Route path= 'donors' element={<Donors />}/>
+    <Route path= 'donatedblood' element={<DonatedBlood/>}/>
     <Route 
     path='finddonor' element={<Finddonor />}/>
     </Route>

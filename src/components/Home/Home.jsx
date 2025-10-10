@@ -43,8 +43,8 @@ export default function Home() {
           </p>
 
           <Link
-            to="/"
-            className="inline-flex items-center justify-center px-6 py-3 text-white font-medium bg-red-700 rounded-lg hover:bg-red-600 transition"
+            to="/donatedblood"
+            className="inline-flex items-center justify-center px-6 py-3 text-white font-medium bg-red-700 rounded-lg hover:bg-red-600 transition hover:opacity-80"
           >
             Learn about Donated Blood
           </Link>

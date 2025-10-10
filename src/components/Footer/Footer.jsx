@@ -76,10 +76,9 @@ export default function Footer() {
 
           {/* Social Icons */}
           <div className="flex justify-center sm:justify-end mt-4 sm:mt-0 space-x-5 text-gray-500">
-            <a href="#" className="hover:text-red-700"></a>
-            <a href="#" className="hover:text-red-700"></a>
+            
             <a href="https://github.com/ayush-gaur29" className="hover:text-red-700"></a>
-            <a href="#" className="hover:text-red-700"></a>
+            
           </div>
         </div>
       </div>

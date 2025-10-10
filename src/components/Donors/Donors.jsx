@@ -1,8 +1,6 @@
 
-
-// AddDonor.jsx
 import React, { useState, useEffect } from "react";
-
+import { motion } from "framer-motion";
 function Finddonor() {
   const [donors, setDonors] = useState(() => {
     // Load donors from localStorage or empty array
@@ -33,6 +31,12 @@ function Finddonor() {
   };
 
   return (
+    <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 1 }}
+        >
     <div className="max-w-2xl mx-auto p-6 bg-white rounded shadow">
       <h2 className="text-2xl font-bold text-red-700 mb-4 flex items-center gap-2">
         <span>🩸</span> Add Blood Donor Details
@@ -82,6 +86,7 @@ function Finddonor() {
         </button>
       </form>
     </div>
+    </motion.div>
   );
 }
 
