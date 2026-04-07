@@ -12,7 +12,7 @@ export default function Footer() {
           <div className="mb-6 md:mb-0 flex justify-center md:justify-start">
             <Link to="/" className="flex items-center justify-center">
               <img
-                src="logo.png"
+                src="blood_footer.png"
                 className="h-36 w-36"
                 alt="Logo"
               />
