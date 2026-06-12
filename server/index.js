@@ -6,11 +6,19 @@ const cors = require("cors");
 const app = express();
 const mongoose = require("mongoose");
 
-mongoose
-  .connect(process.env.MONGO_URI)
-  .then(() => console.log("MongoDB connected"))
-  .catch((err) => console.log(err));
+mongoose.connect(process.env.MONGO_URI)
+  .then(() => {
+    console.log("MongoDB connected");
 
+    app.listen(process.env.PORT || 8080, "0.0.0.0", () => {
+      console.log("Server started");
+    });
+
+  })
+  .catch((err) => {
+    console.error("MongoDB error:", err);
+    process.exit(1);
+  });
 
 app.use(cors());
 app.use(express.json());
