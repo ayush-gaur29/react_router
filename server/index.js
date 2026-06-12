@@ -7,7 +7,7 @@ const app = express();
 const mongoose = require("mongoose");
 
 mongoose
-  .connect("mongodb+srv://ayushgaur9557_db_user:fimNaxFfqLq27S9Y@redroute.tzr3quu.mongodb.net/")
+  .connect("mongodb+srv://ayushgaur9557_db_user:DT2fN7LdEoVlQBcZ@redroute.tzr3quu.mongodb.net/")
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
 
