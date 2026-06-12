@@ -7,7 +7,7 @@ const app = express();
 const mongoose = require("mongoose");
 
 mongoose
-  .connect("mongodb+srv://ayushgaur9557_db_user:DT2fN7LdEoVlQBcZ@redroute.tzr3quu.mongodb.net/")
+  .connect(process.env.MONGO_URI)
   .then(() => console.log("MongoDB connected"))
   .catch((err) => console.log(err));
 
@@ -24,6 +24,8 @@ app.get("/", (req, res) => {
   res.send("Backend is running successfully");
 });
 
-app.listen(5000, () => {
-  console.log("Server running on port 5000");
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
