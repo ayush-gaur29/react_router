@@ -8,7 +8,8 @@ import axios from "axios";
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [isDonor, setIsDonor] = useState(true); // donor status
+  const [isDonor, setIsDonor] = useState(false); // default false, not true
+
   const navigate = useNavigate();
 
   const token = localStorage.getItem("token");
@@ -19,6 +20,24 @@ function Header() {
     localStorage.removeItem("user");
     navigate("/login");
   };
+  useEffect(() => {
+  const fetchDonorStatus = async () => {
+    if (!token) return;
+    try {
+      const res = await axios.get("http://localhost:5000/api/donors/me", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      setIsDonor(res.data.isDonor);
+    } catch (error) {
+      console.error("Error fetching donor status:", error);
+      setIsDonor(false);
+    }
+  };
+
+  fetchDonorStatus();
+}, [token]);
 
   const handleDeleteDonor = async () => {
     if (!window.confirm("Are you sure you want to remove yourself as a donor?")) {
