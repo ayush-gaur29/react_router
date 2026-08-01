@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
-
+import { API_URL } from "../../config";
 function Finddonor() {
   const [donors, setDonors] = useState([]);
   const [search, setSearch] = useState("");
@@ -10,7 +10,7 @@ function Finddonor() {
 
   useEffect(() => {
     axios
-      .get("http://localhost:5000/api/donors")
+      .get(`${API_URL}/api/donors`)
       .then((res) => {
         setDonors(res.data);
       })

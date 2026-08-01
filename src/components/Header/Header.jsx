@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { Link, NavLink, useNavigate } from "react-router-dom";
 import { Menu, X, User } from "lucide-react";
 import { useEffect, useRef } from "react";
-
+import { API_URL } from "../../config";
 import axios from "axios";
 
 function Header() {
@@ -24,7 +24,7 @@ function Header() {
   const fetchDonorStatus = async () => {
     if (!token) return;
     try {
-      const res = await axios.get("http://localhost:5000/api/donors/me", {
+      const res = await axios.get(`${API_URL}/api/donors/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import axios from "axios";
-
+import { API_URL } from "../../config";
 function AddDonor() {
   const [formData, setFormData] = useState({
     name: "",
@@ -48,7 +48,7 @@ function AddDonor() {
       const token = localStorage.getItem("token");
 
       await axios.post(
-        "http://localhost:5000/api/donors/add",
+        `${API_URL}/api/donors/add`,
         {
           ...formData,
           location, // ✅ LOCATION SEND

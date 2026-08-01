@@ -1,7 +1,7 @@
 import React, { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { MessageCircle, X, Send } from "lucide-react";
-
+import { API_URL } from "../../config";
 function ChatWidget() {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState([
@@ -28,7 +28,7 @@ function ChatWidget() {
     setLoading(true);
 
     try {
-      const res = await axios.post("http://localhost:5000/api/chat", {
+      const res = await axios.post(`${API_URL}/api/chat`, {
         message: input,
       });
 

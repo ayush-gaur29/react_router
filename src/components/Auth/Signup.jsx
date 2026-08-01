@@ -3,7 +3,7 @@ import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
 import { FaUser, FaEnvelope, FaLock, FaTint, FaEye, FaEyeSlash } from "react-icons/fa";
-
+import { API_URL } from "../../config";
 function Signup() {
 
   const navigate = useNavigate();
@@ -35,7 +35,7 @@ function Signup() {
     try {
 
       await axios.post(
-        "http://localhost:5000/api/auth/signup",
+        `${API_URL}/api/auth/signup`,
         {
           name: formData.name,
           email: formData.email,
