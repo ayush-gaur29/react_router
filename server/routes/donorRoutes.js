@@ -1,7 +1,30 @@
 const express = require("express");
 const router = express.Router();
 const Donor = require("../models/Donor");
+const User = require("../models/User");
 const authMiddleware = require("../middleware/authMiddleware");
+
+/* ===========================
+   ✅ GET PLATFORM STATS (PUBLIC)
+   =========================== */
+router.get("/stats", async (req, res) => {
+  try {
+    const totalDonors = await Donor.countDocuments();
+    const cities = await Donor.distinct("city");
+    const bloodGroups = await Donor.distinct("bloodGroup");
+    const totalUsers = await User.countDocuments();
+
+    res.json({
+      totalDonors,
+      totalCities: cities.length,
+      citiesList: cities,
+      totalBloodGroups: bloodGroups.length,
+      totalUsers,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Server error fetching stats" });
+  }
+});
 
 /* ===========================
    ✅ GET ALL DONORS (PUBLIC)

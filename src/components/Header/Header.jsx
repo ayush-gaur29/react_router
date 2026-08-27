@@ -1,226 +1,290 @@
-import React, { useState } from "react";
-import { Link, NavLink, useNavigate } from "react-router-dom";
-import { Menu, X, User } from "lucide-react";
-import { useEffect, useRef } from "react";
-import { API_URL } from "../../config";
+import React, { useState, useEffect } from "react";
+import { Link, NavLink, useNavigate, useLocation } from "react-router-dom";
+import {
+  Menu,
+  X,
+  User,
+  Droplet,
+  HeartPulse,
+  LogOut,
+  ShieldCheck,
+  PhoneCall,
+  Search,
+  Home as HomeIcon,
+  Info,
+  ChevronDown
+} from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
 import axios from "axios";
+import { API_URL } from "../../config";
+import { useToast } from "../../context/ToastContext";
 
 function Header() {
   const [isOpen, setIsOpen] = useState(false);
   const [profileOpen, setProfileOpen] = useState(false);
-  const [isDonor, setIsDonor] = useState(false); // default false, not true
+  const [isDonor, setIsDonor] = useState(false);
 
   const navigate = useNavigate();
+  const location = useLocation();
+  const { showToast } = useToast();
 
   const token = localStorage.getItem("token");
-  const user = JSON.parse(localStorage.getItem("user")); // { name }
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsOpen(false);
+    setProfileOpen(false);
+  }, [location.pathname]);
 
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("user");
+    showToast("Logged out successfully.", "info");
     navigate("/login");
   };
-  useEffect(() => {
-  const fetchDonorStatus = async () => {
-    if (!token) return;
-    try {
-      const res = await axios.get(`${API_URL}/api/donors/me`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      setIsDonor(res.data.isDonor);
-    } catch (error) {
-      console.error("Error fetching donor status:", error);
-      setIsDonor(false);
-    }
-  };
 
-  fetchDonorStatus();
-}, [token]);
+  useEffect(() => {
+    const fetchDonorStatus = async () => {
+      if (!token) return;
+      try {
+        const res = await axios.get(`${API_URL}/api/donors/me`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        setIsDonor(res.data.isDonor);
+      } catch (error) {
+        console.error("Error fetching donor status:", error);
+        setIsDonor(false);
+      }
+    };
+
+    fetchDonorStatus();
+  }, [token]);
 
   const handleDeleteDonor = async () => {
-    if (!window.confirm("Are you sure you want to remove yourself as a donor?")) {
+    if (!window.confirm("Are you sure you want to remove yourself as an active donor?")) {
       return;
     }
 
     try {
-      await axios.delete("http://localhost:5000/api/donors/me", {
+      await axios.delete(`${API_URL}/api/donors/me`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      alert("You are removed as a donor 🩸");
-      setIsDonor(false); // 🔥 dropdown option toggle
+      showToast("You have been removed as a donor 🩸", "info");
+      setIsDonor(false);
       setProfileOpen(false);
     } catch (error) {
       console.error(error);
-      alert("Error removing donor");
+      showToast("Error removing donor status.", "error");
     }
   };
 
-
+  const navLinks = [
+    { name: "Home", path: "/", icon: <HomeIcon className="w-4 h-4" /> },
+    { name: "About", path: "/about", icon: <Info className="w-4 h-4" /> },
+    { name: "Contact", path: "/contact", icon: <PhoneCall className="w-4 h-4" /> },
+    { name: "Find Donors", path: "/finddonor", icon: <Search className="w-4 h-4" /> },
+  ];
 
   return (
-    <header className="shadow sticky z-50 top-0">
-      <nav className="bg-white border-gray-200 px-4 lg:px-6 py-2.5">
-        <div className="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
+    <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200/80 shadow-xs transition-all">
+      <nav className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-18">
 
-          {/* Left section */}
+          {/* Left: Brand Logo & Title */}
           <div className="flex items-center gap-3">
-            <Link to="/" className="flex items-center">
-              <img src="blood_logo.png" className="h-14 w-14" alt="Logo" />
+            <Link to="/" className="flex items-center gap-2 group">
+              <img src="blood_logo.png" className="h-14 w-14 object-contain" alt="Logo" />
+              <div className="flex flex-col">
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xl font-black tracking-tight text-slate-900 group-hover:text-red-700 transition-colors">
+                    RedRoute
+                  </span>
+                  <span className="w-2 h-2 rounded-full bg-red-600 animate-pulse"></span>
+                </div>
+                <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400 -mt-0.5">
+                  Blood Donor Finder
+                </span>
+              </div>
             </Link>
-
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden text-red-700 p-2 rounded-md"
-            >
-              {isOpen ? <X size={26} /> : <Menu size={26} />}
-            </button>
           </div>
 
-          {/* Right-side */}
-          <div className="relative flex items-center lg:order-2">
+          {/* Center: Desktop Navigation Links */}
+          <div className="hidden lg:flex items-center gap-1">
+            {navLinks.map((link) => (
+              <NavLink
+                key={link.path}
+                to={link.path}
+                className={({ isActive }) =>
+                  `px-4 py-2 rounded-xl text-sm font-bold transition-all duration-200 flex items-center gap-2 ${
+                    isActive
+                      ? "text-red-700 bg-red-50/90 shadow-xs"
+                      : "text-slate-600 hover:text-red-700 hover:bg-slate-50"
+                  }`
+                }
+              >
+                {link.name}
+              </NavLink>
+            ))}
+          </div>
+
+          {/* Right: Auth Buttons / User Profile */}
+          <div className="flex items-center gap-3">
             {!token ? (
-              <>
+              <div className="hidden sm:flex items-center gap-2">
                 <Link
                   to="/login"
-                  className="text-white bg-red-700 hover:bg-red-600 font-medium rounded-lg text-sm px-4 py-2 mr-2"
+                  className="px-4 py-2 text-sm font-bold text-slate-700 hover:text-red-700 hover:bg-slate-100 rounded-xl transition"
                 >
-                  Login
+                  Log In
                 </Link>
-
                 <Link
                   to="/signup"
-                  className="text-red-700 border border-red-700 hover:bg-red-700 hover:text-white font-medium rounded-lg text-sm px-4 py-2"
+                  className="px-4 py-2 text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md shadow-red-600/20 hover:shadow-red-600/35 transition-all"
                 >
-                  Signup
+                  Sign Up
                 </Link>
-              </>
+              </div>
             ) : (
-              <>
-                {/* 🔵 PROFILE CIRCLE */}
+              <div className="relative">
+                {/* Profile Circle Trigger */}
                 <button
                   onClick={() => setProfileOpen(!profileOpen)}
-                  className="w-10 h-10 rounded-full bg-red-700 text-white flex items-center justify-center"
+                  className="flex items-center gap-2 p-1.5 pr-3 rounded-full bg-slate-100 hover:bg-slate-200/80 border border-slate-200 transition cursor-pointer"
+                  aria-label="User Profile Menu"
                 >
-                  <User size={18} />
+                  <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-red-600 to-rose-600 text-white font-bold text-sm flex items-center justify-center shadow-xs">
+                    {user?.name ? user.name.charAt(0).toUpperCase() : <User className="w-4 h-4" />}
+                  </div>
+                  <span className="text-xs font-bold text-slate-700 max-w-[100px] truncate hidden md:inline">
+                    {user?.name || "My Account"}
+                  </span>
+                  <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform ${profileOpen ? "rotate-180" : ""}`} />
                 </button>
 
-                {/* DROPDOWN */}
-               
-  {profileOpen && (
-  <div className="absolute right-0 top-14 w-64 bg-white rounded-2xl shadow-2xl border border-gray-100 z-50">
+                {/* Dropdown Menu */}
+                <AnimatePresence>
+                  {profileOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                      animate={{ opacity: 1, y: 0, scale: 1 }}
+                      exit={{ opacity: 0, y: 5, scale: 0.95 }}
+                      transition={{ duration: 0.15 }}
+                      className="absolute right-0 top-12 w-64 bg-white rounded-2xl shadow-2xl border border-slate-200/80 z-50 overflow-hidden"
+                    >
+                      {/* Header */}
+                      <div className="px-5 py-4 bg-gradient-to-r from-red-700 to-rose-700 text-white">
+                        <p className="text-xs text-red-100 font-medium">Logged in as</p>
+                        <p className="text-sm font-bold truncate mt-0.5">{user?.name || "Registered User"}</p>
+                        {user?.email && <p className="text-xs text-red-200 truncate">{user.email}</p>}
+                      </div>
 
-    {/* HEADER */}
-    <div className="flex items-center gap-3 px-5 py-4 bg-gradient-to-r from-red-600 to-red-700 rounded-t-2xl">
-      <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center text-white font-semibold">
-        {user?.name?.charAt(0).toUpperCase()}
-      </div>
-      <div className="text-white">
-        <p className="text-sm opacity-80">Welcome</p>
-        
-      </div>
-    </div>
+                      {/* Options */}
+                      <div className="p-2 space-y-1 text-sm">
+                        {!isDonor ? (
+                          <Link
+                            to="/donors"
+                            onClick={() => setProfileOpen(false)}
+                            className="flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-slate-700 hover:bg-slate-50 hover:text-red-700 font-semibold transition"
+                          >
+                            <span className="w-2 h-2 rounded-full bg-emerald-500"></span>
+                            <span>Register as Donor</span>
+                          </Link>
+                        ) : (
+                          <button
+                            onClick={handleDeleteDonor}
+                            className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-slate-700 hover:bg-red-50 hover:text-red-700 font-semibold transition text-left cursor-pointer"
+                          >
+                            <span className="w-2 h-2 rounded-full bg-red-500"></span>
+                            <span>Remove Donor Status</span>
+                          </button>
+                        )}
 
-    {/* BODY */}
-    <div className="py-2">
+                        <div className="border-t border-slate-100 my-1"></div>
 
-      {!isDonor && (
-        <Link
-          to="/donors"
-          onClick={() => setProfileOpen(false)}
-          className="flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition"
-        >
-          <span className="w-2 h-2 rounded-full bg-green-500"></span>
-          Register as Donor
-        </Link>
-      )}
-
-      {isDonor && (
-        <button
-          onClick={handleDeleteDonor}
-          className="w-full flex items-center gap-3 px-5 py-3 text-sm text-gray-700 hover:bg-gray-50 transition"
-        >
-          <span className="w-2 h-2 rounded-full bg-red-500"></span>
-          Remove Donor Status
-        </button>
-      )}
-
-      <div className="my-2 border-t"></div>
-
-      <button
-        onClick={handleLogout}
-        className="w-full text-left px-5 py-3 text-sm text-red-600 hover:bg-red-50 transition rounded-b-2xl"
-      >
-        Logout
-      </button>
-
-    </div>
-  </div>
-)}
-
-
-              </>
+                        <button
+                          onClick={handleLogout}
+                          className="w-full flex items-center gap-2.5 px-3.5 py-2.5 rounded-xl text-red-600 hover:bg-red-50 font-bold transition text-left cursor-pointer"
+                        >
+                          <LogOut className="w-4 h-4" />
+                          <span>Logout</span>
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
             )}
-          </div>
 
-          {/* 🔒 NAVIGATION LINKS — EXACTLY AS YOU GAVE */}
-          <div
-            className={`${
-              isOpen ? "block" : "hidden"
-            } justify-between items-center w-full lg:flex lg:w-auto lg:order-1`}
-          >
-            <ul className="flex flex-col mt-4 font-medium lg:flex-row lg:space-x-12 lg:mt-0">
-
-              <li>
-                <NavLink to="/" className={({ isActive }) =>
-                  `block py-2 pr-4 pl-3 duration-200 ${
-                    isActive ? "text-red-700" : "text-gray-700"
-                  } border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-red-600 lg:p-0`
-                }>
-                  Home
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to="/about" className={({ isActive }) =>
-                  `block py-2 pr-4 pl-3 duration-200 ${
-                    isActive ? "text-red-700" : "text-gray-700"
-                  } border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-red-600 lg:p-0`
-                }>
-                  About
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to="/contact" className={({ isActive }) =>
-                  `block py-2 pr-4 pl-3 duration-200 ${
-                    isActive ? "text-red-700" : "text-gray-700"
-                  } border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-red-600 lg:p-0`
-                }>
-                  Contact
-                </NavLink>
-              </li>
-
-              <li>
-                <NavLink to="/finddonor" className={({ isActive }) =>
-                  `block py-2 pr-4 pl-3 duration-200 ${
-                    isActive ? "text-red-700" : "text-gray-700"
-                  } border-b border-gray-100 hover:bg-gray-50 lg:hover:bg-transparent lg:border-0 hover:text-red-600 lg:p-0`
-                }>
-                  Donors
-                </NavLink>
-              </li>
-            </ul>
+            {/* Mobile Hamburger Button */}
+            <button
+              onClick={() => setIsOpen(!isOpen)}
+              className="lg:hidden p-2 rounded-xl text-slate-700 hover:text-red-700 hover:bg-slate-100 transition cursor-pointer"
+              aria-label="Toggle Menu"
+            >
+              {isOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+            </button>
           </div>
 
         </div>
       </nav>
+
+      {/* Mobile Slide-in Drawer */}
+      <AnimatePresence>
+        {isOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: "auto" }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.2 }}
+            className="lg:hidden bg-white border-b border-slate-200/80 px-4 pt-2 pb-6 space-y-3"
+          >
+            <div className="space-y-1">
+              {navLinks.map((link) => (
+                <NavLink
+                  key={link.path}
+                  to={link.path}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition ${
+                      isActive
+                        ? "text-red-700 bg-red-50"
+                        : "text-slate-700 hover:bg-slate-50"
+                    }`
+                  }
+                >
+                  {link.icon}
+                  <span>{link.name}</span>
+                </NavLink>
+              ))}
+            </div>
+
+            {!token && (
+              <div className="grid grid-cols-2 gap-2 pt-3 border-t border-slate-100">
+                <Link
+                  to="/login"
+                  className="w-full py-2.5 text-center text-sm font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 rounded-xl transition"
+                >
+                  Log In
+                </Link>
+                <Link
+                  to="/signup"
+                  className="w-full py-2.5 text-center text-sm font-bold text-white bg-red-600 hover:bg-red-700 rounded-xl shadow-md transition"
+                >
+                  Sign Up
+                </Link>
+              </div>
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </header>
   );
 }
 
 export default Header;
+

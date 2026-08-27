@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import axios from "axios";
 import { motion } from "framer-motion";
 import { useNavigate, Link } from "react-router-dom";
-import { FaEnvelope, FaLock, FaTint, FaEye, FaEyeSlash } from "react-icons/fa";
-import  {API_URL} from "../../config";
-function Login() {
+import { Mail, Lock, Droplet, Eye, EyeOff, Loader2, ArrowRight, ShieldCheck, HeartPulse } from "lucide-react";
+import { API_URL } from "../../config";
+import { useToast } from "../../context/ToastContext";
 
+function Login() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -14,6 +16,7 @@ function Login() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -24,135 +27,166 @@ function Login() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setLoading(true);
 
     try {
-
       const res = await axios.post(`${API_URL}/api/auth/login`, formData);
 
       localStorage.setItem("token", res.data.token);
+      if (res.data.user) {
+        localStorage.setItem("user", JSON.stringify(res.data.user));
+      }
 
+      showToast(`Welcome back, ${res.data.user?.name || 'Hero'}! 🩸`, "success");
       navigate("/finddonor");
-
     } catch (error) {
-      alert("Invalid email or password");
+      showToast(error.response?.data?.message || "Invalid email or password", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-red-100 px-4">
-
+    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center bg-gradient-to-br from-red-50/60 via-slate-50 to-rose-50/60 px-4 py-12">
       <motion.div
-        initial={{ opacity:0, y:40 }}
-        animate={{ opacity:1, y:0 }}
-        transition={{ duration:0.6 }}
-        className="flex bg-white shadow-2xl rounded-2xl overflow-hidden max-w-4xl w-full"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="flex flex-col md:flex-row bg-white shadow-2xl rounded-3xl overflow-hidden max-w-4xl w-full border border-slate-200/80"
       >
+        {/* LEFT BRANDING PANEL */}
+        <div className="md:w-5/12 bg-gradient-to-br from-red-700 via-red-600 to-rose-700 text-white p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden">
+          {/* Subtle ambient circle */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* LEFT SECTION */}
+          <div className="relative z-10">
+            <Link to="/" className="inline-flex items-center gap-2 mb-8">
+              <div className="w-10 h-10 rounded-xl bg-white text-red-600 flex items-center justify-center font-black shadow-md">
+                <Droplet className="w-6 h-6 fill-red-600" />
+              </div>
+              <span className="text-xl font-black tracking-tight">RedRoute</span>
+            </Link>
 
-        <div className="hidden md:flex flex-col justify-center items-center bg-red-700 text-white w-1/2 p-10">
+            <div className="space-y-4 my-8">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
+                <HeartPulse className="w-3.5 h-3.5" />
+                Community Lifeline
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black leading-tight tracking-tight">
+                Every drop brings another tomorrow.
+              </h2>
+              <p className="text-red-100 text-sm leading-relaxed">
+                Log in to connect with blood seekers, manage your donor status, and respond to urgent hospital calls.
+              </p>
+            </div>
+          </div>
 
-          <FaTint size={70} className="mb-6 animate-pulse"/>
-
-          <h2 className="text-3xl font-bold text-center mb-3">
-            Welcome to RedRoute
-          </h2>
-
-          <p className="text-sm text-center text-red-100">
-            Connecting blood donors with people who need them the most.
-          </p>
-
+          <div className="relative z-10 pt-6 border-t border-white/20 flex items-center gap-2 text-xs font-semibold text-red-100">
+            <ShieldCheck className="w-4 h-4 text-white" />
+            <span>Secure JWT Encrypted Authentication</span>
+          </div>
         </div>
 
-        {/* LOGIN FORM */}
+        {/* RIGHT LOGIN FORM */}
+        <div className="md:w-7/12 p-8 sm:p-12 flex flex-col justify-center">
+          <div className="mb-8">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Welcome Back
+            </h2>
+            <p className="text-slate-500 text-sm mt-1">
+              Please enter your credentials to access your account.
+            </p>
+          </div>
 
-        <div className="w-full md:w-1/2 p-8">
-
-          <h2 className="text-3xl font-bold text-red-700 text-center mb-1">
-            Welcome Back 🩸
-          </h2>
-
-          <p className="text-gray-500 text-sm text-center mb-6">
-            Login to continue saving lives
-          </p>
-
-          <form onSubmit={handleSubmit}>
-
+          <form onSubmit={handleSubmit} className="space-y-5">
             {/* EMAIL */}
-
-            <div className="mb-4 relative">
-
-              <FaEnvelope className="absolute left-3 top-3.5 text-gray-400"/>
-
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full border rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                Email Address
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="name@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-10 pr-4 py-3 bg-slate-50 hover:bg-slate-100/60 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                />
+              </div>
             </div>
-
 
             {/* PASSWORD */}
-
-            <div className="mb-4 relative">
-
-              <FaLock className="absolute left-3 top-3.5 text-gray-400"/>
-
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                className="w-full border rounded-lg pl-10 pr-10 py-2.5 focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-
-              <span
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3.5 cursor-pointer text-gray-500"
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </span>
-
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
+                  Password
+                </label>
+              </div>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Lock className="w-4 h-4" />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="••••••••"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-10 pr-11 py-3 bg-slate-50 hover:bg-slate-100/60 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                  aria-label="Toggle password visibility"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
 
-
-            {/* BUTTON */}
-
+            {/* SUBMIT BUTTON */}
             <button
               type="submit"
-              className="w-full bg-red-700 text-white py-2.5 rounded-lg font-semibold hover:bg-red-800 transition duration-300 shadow-md"
+              disabled={loading}
+              className="w-full mt-2 py-3.5 px-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 disabled:opacity-70 text-white font-bold rounded-xl shadow-lg shadow-red-600/25 hover:shadow-red-600/40 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
             >
-              Login
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Logging in...</span>
+                </>
+              ) : (
+                <>
+                  <span>Sign In to RedRoute</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
-
           </form>
 
-
-          <p className="text-center text-sm text-gray-600 mt-6">
-            Don’t have an account?{" "}
-            <Link
-              to="/signup"
-              className="text-red-700 font-semibold hover:underline"
-            >
-              Sign up
-            </Link>
-          </p>
-
+          {/* SIGNUP LINK */}
+          <div className="mt-8 pt-6 border-t border-slate-100 text-center">
+            <p className="text-sm text-slate-500">
+              Don't have an account yet?{" "}
+              <Link
+                to="/signup"
+                className="font-bold text-red-600 hover:text-red-700 hover:underline underline-offset-4 ml-1"
+              >
+                Create an account
+              </Link>
+            </p>
+          </div>
         </div>
-
       </motion.div>
-
     </div>
-
   );
 }
 
-export default Login;
+export default Login;

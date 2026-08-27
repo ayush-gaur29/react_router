@@ -2,11 +2,13 @@ import React, { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { FaUser, FaEnvelope, FaLock, FaTint, FaEye, FaEyeSlash } from "react-icons/fa";
+import { User, Mail, Lock, Eye, EyeOff, Loader2, Droplet, ArrowRight, ShieldCheck, HeartPulse, CheckCircle2 } from "lucide-react";
 import { API_URL } from "../../config";
-function Signup() {
+import { useToast } from "../../context/ToastContext";
 
+function Signup() {
   const navigate = useNavigate();
+  const { showToast } = useToast();
 
   const [formData, setFormData] = useState({
     name: "",
@@ -16,6 +18,7 @@ function Signup() {
   });
 
   const [showPassword, setShowPassword] = useState(false);
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     setFormData({
@@ -27,13 +30,19 @@ function Signup() {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if(formData.password !== formData.confirmPassword){
-      alert("Passwords do not match");
+    if (formData.password !== formData.confirmPassword) {
+      showToast("Passwords do not match. Please re-enter.", "warning");
       return;
     }
 
-    try {
+    if (formData.password.length < 6) {
+      showToast("Password should be at least 6 characters long.", "warning");
+      return;
+    }
 
+    setLoading(true);
+
+    try {
       await axios.post(
         `${API_URL}/api/auth/signup`,
         {
@@ -43,169 +52,202 @@ function Signup() {
         }
       );
 
-      alert("Signup successful! Please login.");
-
+      showToast("Registration successful! Please log in.", "success");
       navigate("/login");
-
     } catch (err) {
-
-      alert(err.response?.data?.message || "Signup failed");
-
+      showToast(err.response?.data?.message || "Signup failed. Please try again.", "error");
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-red-50 via-white to-red-100 px-4">
-
+    <div className="min-h-[calc(100vh-80px)] flex items-center justify-center bg-gradient-to-br from-red-50/60 via-slate-50 to-rose-50/60 px-4 py-12">
       <motion.div
-        initial={{ opacity:0, y:40 }}
-        animate={{ opacity:1, y:0 }}
-        transition={{ duration:0.6 }}
-        className="flex bg-white shadow-2xl rounded-2xl overflow-hidden max-w-4xl w-full"
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="flex flex-col md:flex-row bg-white shadow-2xl rounded-3xl overflow-hidden max-w-4xl w-full border border-slate-200/80"
       >
+        {/* LEFT BRANDING PANEL */}
+        <div className="md:w-5/12 bg-gradient-to-br from-red-700 via-red-600 to-rose-700 text-white p-8 sm:p-10 flex flex-col justify-between relative overflow-hidden">
+          {/* Subtle ambient circle */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-white/10 rounded-full blur-3xl pointer-events-none" />
 
-        {/* LEFT DESIGN */}
+          <div className="relative z-10">
+            <Link to="/" className="inline-flex items-center gap-2 mb-8">
+              <div className="w-10 h-10 rounded-xl bg-white text-red-600 flex items-center justify-center font-black shadow-md">
+                <Droplet className="w-6 h-6 fill-red-600" />
+              </div>
+              <span className="text-xl font-black tracking-tight">RedRoute</span>
+            </Link>
 
-        <div className="hidden md:flex flex-col justify-center items-center bg-red-700 text-white w-1/2 p-10">
+            <div className="space-y-4 my-8">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-white/15 text-xs font-bold uppercase tracking-wider backdrop-blur-sm">
+                <HeartPulse className="w-3.5 h-3.5" />
+                Join the Lifesaver Network
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black leading-tight tracking-tight">
+                Be someone’s miracle today.
+              </h2>
+              <p className="text-red-100 text-sm leading-relaxed">
+                Create an account to join India's fastest voluntary blood network, search nearby donors, and request help for your loved ones.
+              </p>
+            </div>
+          </div>
 
-          <FaTint size={70} className="mb-6 animate-pulse"/>
-
-          <h2 className="text-3xl font-bold text-center mb-3">
-            Join RedRoute
-          </h2>
-
-          <p className="text-sm text-center text-red-100">
-            Become a donor and help save lives by connecting people who need blood urgently.
-          </p>
-
+          <div className="relative z-10 pt-6 border-t border-white/20 space-y-2 text-xs font-semibold text-red-100">
+            <div className="flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 text-white" />
+              <span>100% Free & Open Access</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <ShieldCheck className="w-4 h-4 text-white" />
+              <span>Your privacy and data are secure</span>
+            </div>
+          </div>
         </div>
 
+        {/* RIGHT SIGNUP FORM */}
+        <div className="md:w-7/12 p-8 sm:p-12 flex flex-col justify-center">
+          <div className="mb-6">
+            <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
+              Create an Account
+            </h2>
+            <p className="text-slate-500 text-sm mt-1">
+              Join thousands of everyday heroes across India.
+            </p>
+          </div>
 
-        {/* FORM */}
-
-        <div className="w-full md:w-1/2 p-8">
-
-          <h2 className="text-3xl font-bold text-red-700 text-center mb-1">
-            Create Account 🩸
-          </h2>
-
-          <p className="text-gray-500 text-sm text-center mb-6">
-            Join us & become a life saver
-          </p>
-
-          <form onSubmit={handleSubmit}>
-
-            {/* NAME */}
-
-            <div className="mb-4 relative">
-
-              <FaUser className="absolute left-3 top-3.5 text-gray-400"/>
-
-              <input
-                type="text"
-                name="name"
-                placeholder="Full Name"
-                value={formData.name}
-                onChange={handleChange}
-                required
-                className="w-full border rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-
+          <form onSubmit={handleSubmit} className="space-y-4">
+            {/* FULL NAME */}
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                Full Name
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <User className="w-4 h-4" />
+                </div>
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="e.g. Ayush Gaur"
+                  value={formData.name}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/60 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                />
+              </div>
             </div>
 
-
-            {/* EMAIL */}
-
-            <div className="mb-4 relative">
-
-              <FaEnvelope className="absolute left-3 top-3.5 text-gray-400"/>
-
-              <input
-                type="email"
-                name="email"
-                placeholder="Email Address"
-                value={formData.email}
-                onChange={handleChange}
-                required
-                className="w-full border rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-
+            {/* EMAIL ADDRESS */}
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                Email Address
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Mail className="w-4 h-4" />
+                </div>
+                <input
+                  type="email"
+                  name="email"
+                  placeholder="name@example.com"
+                  value={formData.email}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/60 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                />
+              </div>
             </div>
-
 
             {/* PASSWORD */}
-
-            <div className="mb-4 relative">
-
-              <FaLock className="absolute left-3 top-3.5 text-gray-400"/>
-
-              <input
-                type={showPassword ? "text" : "password"}
-                name="password"
-                placeholder="Password"
-                value={formData.password}
-                onChange={handleChange}
-                required
-                className="w-full border rounded-lg pl-10 pr-10 py-2.5 focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-
-              <span
-                onClick={() => setShowPassword(!showPassword)}
-                className="absolute right-3 top-3.5 cursor-pointer text-gray-500"
-              >
-                {showPassword ? <FaEyeSlash /> : <FaEye />}
-              </span>
-
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Lock className="w-4 h-4" />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="password"
+                  placeholder="At least 6 characters"
+                  value={formData.password}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-10 pr-11 py-2.5 bg-slate-50 hover:bg-slate-100/60 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute inset-y-0 right-0 pr-3.5 flex items-center text-slate-400 hover:text-slate-600 transition cursor-pointer"
+                  aria-label="Toggle password visibility"
+                >
+                  {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
-
 
             {/* CONFIRM PASSWORD */}
-
-            <div className="mb-5 relative">
-
-              <FaLock className="absolute left-3 top-3.5 text-gray-400"/>
-
-              <input
-                type="password"
-                name="confirmPassword"
-                placeholder="Confirm Password"
-                value={formData.confirmPassword}
-                onChange={handleChange}
-                required
-                className="w-full border rounded-lg pl-10 pr-4 py-2.5 focus:outline-none focus:ring-2 focus:ring-red-500"
-              />
-
+            <div>
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                Confirm Password
+              </label>
+              <div className="relative">
+                <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                  <Lock className="w-4 h-4" />
+                </div>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  name="confirmPassword"
+                  placeholder="Re-enter your password"
+                  value={formData.confirmPassword}
+                  onChange={handleChange}
+                  required
+                  className="w-full pl-10 pr-4 py-2.5 bg-slate-50 hover:bg-slate-100/60 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                />
+              </div>
             </div>
 
-
+            {/* SUBMIT BUTTON */}
             <button
               type="submit"
-              className="w-full bg-red-700 text-white py-2.5 rounded-lg font-semibold hover:bg-red-800 transition duration-300 shadow-md"
+              disabled={loading}
+              className="w-full mt-2 py-3.5 px-4 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 disabled:opacity-70 text-white font-bold rounded-xl shadow-lg shadow-red-600/25 hover:shadow-red-600/40 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer"
             >
-              Create Account
+              {loading ? (
+                <>
+                  <Loader2 className="w-5 h-5 animate-spin" />
+                  <span>Creating Account...</span>
+                </>
+              ) : (
+                <>
+                  <span>Create Account</span>
+                  <ArrowRight className="w-4 h-4" />
+                </>
+              )}
             </button>
-
           </form>
 
-
-          <p className="text-center text-sm text-gray-600 mt-6">
-            Already have an account?{" "}
-            <Link
-              to="/login"
-              className="text-red-700 font-semibold hover:underline"
-            >
-              Login
-            </Link>
-          </p>
-
+          {/* LOGIN LINK */}
+          <div className="mt-6 pt-5 border-t border-slate-100 text-center">
+            <p className="text-sm text-slate-500">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="font-bold text-red-600 hover:text-red-700 hover:underline underline-offset-4 ml-1"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
         </div>
-
       </motion.div>
-
     </div>
-
   );
 }
 
-export default Signup;
+export default Signup;

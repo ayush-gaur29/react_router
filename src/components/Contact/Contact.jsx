@@ -1,10 +1,30 @@
-import React from "react";
+import React, { useState } from "react";
 import emailjs from "emailjs-com";
 import { motion } from "framer-motion";
+import {
+  MapPin,
+  Phone,
+  Mail,
+  Droplet,
+  HeartPulse,
+  Send,
+  Loader2,
+  ShieldAlert,
+  Clock,
+  CheckCircle2,
+  AlertTriangle,
+  User,
+  Activity
+} from "lucide-react";
+import { useToast } from "../../context/ToastContext";
 
 export default function Contact() {
+  const { showToast } = useToast();
+  const [loading, setLoading] = useState(false);
+
   const sendEmail = (e) => {
     e.preventDefault();
+    setLoading(true);
 
     emailjs
       .sendForm(
@@ -15,134 +35,321 @@ export default function Contact() {
       )
       .then(
         () => {
-          alert("Message Sent Successfully ✅");
+          showToast("Emergency blood request sent successfully! We are alerting nearby donors 🩸", "success");
+          e.target.reset();
         },
         (error) => {
-          alert("Failed to send ❌ " + error.text);
+          showToast("Failed to send request: " + (error.text || "Please check your internet connection"), "error");
         }
-      );
-
-    e.target.reset();
+      )
+      .finally(() => {
+        setLoading(false);
+      });
   };
 
   return (
     <motion.div
-      initial={{ opacity: 0, y: 10 }}
+      initial={{ opacity: 0, y: 15 }}
       animate={{ opacity: 1, y: 0 }}
-      exit={{ opacity: 0, y: -10 }}
-      transition={{ duration: 0.8 }}
+      exit={{ opacity: 0, y: -15 }}
+      transition={{ duration: 0.6 }}
+      className="min-h-screen bg-slate-50 py-12 px-4 sm:px-6 lg:px-8"
     >
-      <div className="flex justify-center items-center min-h-[650px] bg-white px-4">
+      <div className="max-w-6xl mx-auto space-y-8">
+        
+        {/* Top Emergency Advisory */}
+        <div className="bg-gradient-to-r from-red-600 via-rose-600 to-red-700 text-white p-4 sm:p-5 rounded-2xl shadow-md flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-3 text-center sm:text-left">
+            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center shrink-0">
+              <ShieldAlert className="w-5 h-5 text-white" />
+            </div>
+            <div>
+              <p className="font-black text-sm sm:text-base">24/7 National Emergency Helpline</p>
+              <p className="text-red-100 text-xs">For immediate critical ambulance/blood bank support, dial <strong>104 / 1910</strong> (India).</p>
+            </div>
+          </div>
+          <a
+            href="tel:104"
+            className="px-4 py-2 bg-white text-red-700 hover:bg-red-50 text-xs font-black rounded-xl shadow transition shrink-0"
+          >
+            Call 104 Hotline
+          </a>
+        </div>
 
-        <div className="max-w-6xl w-full grid grid-cols-1 md:grid-cols-2 gap-10">
+        {/* Main Grid */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          
+          {/* LEFT: CONTACT & EMERGENCY HELPLINE INFO (Red Theme with Floating Blood Drops) */}
+          <div className="lg:col-span-5 bg-gradient-to-br from-red-950 via-rose-950 to-slate-950 text-white p-8 sm:p-10 rounded-3xl shadow-2xl relative overflow-hidden border border-red-900/50">
+            
+            {/* Ambient Red/Rose Corner Glows */}
+            <div className="absolute top-0 right-0 w-64 h-64 bg-red-600/25 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-64 h-64 bg-rose-600/20 rounded-full blur-3xl pointer-events-none" />
 
-          {/* LEFT CONTACT CARD */}
+            {/* 🩸 Animated Floating Blood Drop 1 (Top Left) */}
+            <motion.div
+              animate={{
+                y: [0, -14, 0],
+                x: [0, 6, 0],
+                rotate: [0, 6, 0]
+              }}
+              transition={{
+                duration: 9,
+                repeat: Infinity,
+                ease: "easeInOut"
+              }}
+              className="absolute -top-3 -left-3 pointer-events-none text-red-500/20"
+            >
+              <Droplet className="w-16 h-16 fill-red-500/20" />
+            </motion.div>
 
-          <div className="bg-gray-100 p-10 rounded-xl shadow-md">
+            {/* 🩸 Animated Floating Blood Drop 2 (Bottom Right) */}
+            <motion.div
+              animate={{
+                y: [0, 12, 0],
+                x: [0, -8, 0],
+                rotate: [0, -6, 0]
+              }}
+              transition={{
+                duration: 11,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 1.5
+              }}
+              className="absolute -bottom-4 right-4 pointer-events-none text-rose-500/20"
+            >
+              <Droplet className="w-16 h-16 fill-rose-500/20" />
+            </motion.div>
 
-            <h1 className="text-4xl font-extrabold text-red-700">
-              Get in touch:
-            </h1>
+            {/* 🩸 Animated Floating Blood Drop 3 (Center Right) */}
+            <motion.div
+              animate={{
+                y: [0, -10, 0],
+                x: [0, -5, 0],
+                rotate: [0, 4, 0]
+              }}
+              transition={{
+                duration: 8,
+                repeat: Infinity,
+                ease: "easeInOut",
+                delay: 2.5
+              }}
+              className="absolute top-1/2 right-2 pointer-events-none text-red-400/15"
+            >
+              <Droplet className="w-10 h-10 fill-red-400/15" />
+            </motion.div>
 
-            <p className="text-gray-600 mt-3 text-lg">
-              Fill the form we're here to help!
-            </p>
-
-            <div className="mt-10 space-y-6 text-gray-700">
-
-              <div className="flex items-start gap-4">
-
-                <svg className="w-7 h-7 text-gray-500" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-                </svg>
-
-                <p className="font-semibold">
-                  Islamnagar, Budaun,<br/>
-                  Uttar Pradesh, 243723
+            <div className="relative z-10 space-y-6">
+              <div>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-red-500/20 border border-red-500/30 text-red-300 text-xs font-bold uppercase tracking-wider mb-3">
+                  <HeartPulse className="w-3.5 h-3.5 text-red-400" />
+                  Urgent Patient Support
+                </span>
+                <h1 className="text-3xl font-black tracking-tight text-white">
+                  Get In Touch
+                </h1>
+                <p className="text-red-100/80 text-sm mt-2 leading-relaxed">
+                  Have an urgent requirement or question? Submit this form to broadcast an alert, or contact our support team directly.
                 </p>
+              </div>
+
+              {/* Direct Info List */}
+              <div className="space-y-4 pt-4 border-t border-white/10 text-sm">
+                
+                {/* Location */}
+                <div className="flex items-start gap-3.5 p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 hover:bg-white/15 transition-all">
+                  <div className="w-9 h-9 rounded-xl bg-red-500/20 text-red-400 flex items-center justify-center shrink-0">
+                    <MapPin className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-red-200/70 uppercase tracking-wider">Location Headquarters</p>
+                    <p className="font-semibold text-white mt-0.5">
+                      New Delhi, India (Available Nationwide)
+                    </p>
+                  </div>
+                </div>
+
+                {/* Phone */}
+                <div className="flex items-start gap-3.5 p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 hover:bg-white/15 transition-all">
+                  <div className="w-9 h-9 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                    <Phone className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-emerald-200/70 uppercase tracking-wider">Direct Coordinator Phone</p>
+                    <a
+                      href="tel:+919876543210"
+                      className="font-bold text-emerald-400 hover:text-emerald-300 transition mt-0.5 block"
+                    >
+                      +91 98765 43210
+                    </a>
+                  </div>
+                </div>
+
+                {/* Email */}
+                <div className="flex items-start gap-3.5 p-3.5 rounded-2xl bg-white/10 backdrop-blur-md border border-white/10 hover:bg-white/15 transition-all">
+                  <div className="w-9 h-9 rounded-xl bg-blue-500/20 text-blue-400 flex items-center justify-center shrink-0">
+                    <Mail className="w-4 h-4" />
+                  </div>
+                  <div>
+                    <p className="text-xs font-bold text-blue-200/70 uppercase tracking-wider">Official Email</p>
+                    <a
+                      href="mailto:contact@redroute.app"
+                      className="font-semibold text-blue-400 hover:text-blue-300 transition mt-0.5 block"
+                    >
+                      contact@redroute.app
+                    </a>
+                  </div>
+                </div>
 
               </div>
 
-              <div className="flex items-center gap-4">
-
-                <svg className="w-7 h-7 text-gray-500" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z"/>
-                </svg>
-
-                <p className="font-semibold">
-                  +91 9557565452
-                </p>
-
-              </div>
-
-              <div className="flex items-center gap-4">
-
-                <svg className="w-7 h-7 text-gray-500" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8"/>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
-                </svg>
-
-                <p className="font-semibold">
-                  gaurayush264@gmail.com
-                </p>
-
+              {/* Trust assurances */}
+              <div className="pt-4 border-t border-white/10 space-y-2 text-xs text-red-200/80">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                  <span>Instant automated email dispatch to active team</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <Clock className="w-4 h-4 text-amber-400" />
+                  <span>Average response time within 15 minutes</span>
+                </div>
               </div>
 
             </div>
           </div>
 
+          {/* RIGHT: EMERGENCY BLOOD REQUEST FORM */}
+          <div className="lg:col-span-7 bg-white p-8 sm:p-10 rounded-3xl shadow-xl border border-slate-200/80 relative overflow-hidden">
+            
+            {/* Top gradient highlight */}
+            <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-red-600 to-rose-600" />
 
-          {/* RIGHT FORM */}
+            <div className="mb-6">
+              <span className="text-xs font-bold uppercase tracking-wider text-red-600">Urgent Requirement</span>
+              <h2 className="text-2xl font-bold text-slate-900 mt-1">
+                Post Patient Blood Request
+              </h2>
+              <p className="text-slate-500 text-sm mt-1">
+                Please provide accurate patient and hospital details so responders can act promptly.
+              </p>
+            </div>
 
-          <form
-            className="bg-white p-10 rounded-xl shadow-md space-y-4"
-            onSubmit={sendEmail}
-          >
+            <form onSubmit={sendEmail} className="space-y-4">
+              
+              {/* Patient Name */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                  Patient Full Name <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <User className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="text"
+                    name="name"
+                    placeholder="Enter patient name"
+                    required
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 hover:bg-slate-100/60 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                  />
+                </div>
+              </div>
 
-            <input
-              type="text"
-              name="name"
-              placeholder="Patient Name"
-              required
-              className="w-full py-3 px-4 rounded-lg border border-gray-400 focus:border-red-600 focus:outline-none font-semibold"
-            />
+              {/* Disease / Medical Reason */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                  Disease / Medical Condition / Surgery <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <Activity className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="text"
+                    name="desease"
+                    placeholder="e.g. Emergency Surgery, Dengue, Thalassemia"
+                    required
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 hover:bg-slate-100/60 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                  />
+                </div>
+              </div>
 
-            <input
-              type="text"
-              name="desease"
-              placeholder="Disease Name"
-              required
-              className="w-full py-3 px-4 rounded-lg border border-gray-400 focus:border-red-600 focus:outline-none font-semibold"
-            />
+              {/* Contact Telephone */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                  Attendant Phone Number <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-400">
+                    <Phone className="w-4 h-4" />
+                  </div>
+                  <input
+                    type="tel"
+                    name="tel"
+                    placeholder="Active 10-digit mobile number"
+                    required
+                    className="w-full pl-10 pr-4 py-3 bg-slate-50 hover:bg-slate-100/60 border border-slate-200 rounded-xl text-sm font-medium text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition"
+                  />
+                </div>
+              </div>
 
-            <input
-              type="tel"
-              name="tel"
-              placeholder="Telephone Number"
-              required
-              className="w-full py-3 px-4 rounded-lg border border-gray-400 focus:border-red-600 focus:outline-none font-semibold"
-            />
+              {/* Required Blood Group */}
+              <div>
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">
+                  Required Blood Group <span className="text-red-500">*</span>
+                </label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-red-600">
+                    <Droplet className="w-4 h-4 fill-red-600" />
+                  </div>
+                  <select
+                    name="blood_group"
+                    required
+                    className="w-full pl-10 pr-8 py-3 bg-slate-50 hover:bg-slate-100/60 border border-slate-200 rounded-xl text-sm font-semibold text-slate-800 focus:outline-none focus:ring-2 focus:ring-red-500 focus:border-red-500 transition cursor-pointer appearance-none"
+                  >
+                    <option value="">Select Required Blood Group</option>
+                    <option value="A+">A+ (A Positive)</option>
+                    <option value="A-">A- (A Negative)</option>
+                    <option value="B+">B+ (B Positive)</option>
+                    <option value="B-">B- (B Negative)</option>
+                    <option value="AB+">AB+ (AB Positive)</option>
+                    <option value="AB-">AB- (AB Negative)</option>
+                    <option value="O+">O+ (O Positive)</option>
+                    <option value="O-">O- (O Negative)</option>
+                  </select>
+                </div>
+              </div>
 
-            <input
-              type="text"
-              name="blood_group"
-              placeholder="Required Blood Group"
-              required
-              className="w-full py-3 px-4 rounded-lg border border-gray-400 focus:border-red-600 focus:outline-none font-semibold"
-            />
+              {/* Submit Button */}
+              <button
+                type="submit"
+                disabled={loading}
+                className="w-full mt-4 py-4 px-6 bg-gradient-to-r from-red-600 to-red-700 hover:from-red-500 hover:to-red-600 disabled:opacity-70 text-white font-bold rounded-xl shadow-lg shadow-red-600/25 hover:shadow-red-600/40 hover:-translate-y-0.5 transition-all duration-200 flex items-center justify-center gap-2 cursor-pointer text-base"
+              >
+                {loading ? (
+                  <>
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span>Broadcasting Emergency Request...</span>
+                  </>
+                ) : (
+                  <>
+                    <Send className="w-5 h-5" />
+                    <span>Submit Emergency Blood Request</span>
+                  </>
+                )}
+              </button>
 
-            <button
-              type="submit"
-              className="w-full bg-red-700 hover:bg-red-600 text-white font-bold py-3 rounded-lg mt-2 transition duration-300"
-            >
-              Submit
-            </button>
+            </form>
 
-          </form>
+            <p className="text-center text-xs text-slate-400 mt-4">
+              All requests are dispatched to active blood donor coordinators instantly.
+            </p>
+
+          </div>
 
         </div>
+
       </div>
     </motion.div>
   );
-}
+}
